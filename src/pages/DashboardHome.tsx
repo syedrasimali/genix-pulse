@@ -9,7 +9,7 @@ const stats = [
 ];
 
 const DashboardHome = () => (
-  <div className="p-8">
+  <div className="p-4 sm:p-6 lg:p-8">
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       <h1 className="text-3xl font-display font-bold mb-1">Dashboard</h1>
       <p className="text-muted-foreground mb-8">Welcome back. Here's your pipeline overview.</p>

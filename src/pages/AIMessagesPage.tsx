@@ -38,7 +38,7 @@ const AIMessagesPage = () => {
   };
 
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-2xl">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-display font-bold mb-1">AI Message Generator</h1>
         <p className="text-muted-foreground mb-8">Generate personalized outreach messages powered by AI.</p>

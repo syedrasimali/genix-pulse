@@ -10,7 +10,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="inline-flex items-center gap-2 glass-card px-4 py-2 mb-8 text-sm text-muted-foreground"
+          className="inline-flex items-center gap-2 glass-card px-3 sm:px-4 py-2 mb-6 sm:mb-8 text-xs sm:text-sm text-muted-foreground"
         >
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full rounded-full bg-primary-glow opacity-75 animate-pulse-ring" />
@@ -23,7 +23,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight leading-[1.05] mb-6"
+          className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight leading-[1.1] mb-4 sm:mb-6"
         >
           Find & Convert
           <br />
@@ -36,7 +36,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
-          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
+          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10 px-2"
         >
           Discover high-quality prospects, generate personalized outreach messages,
           and manage your pipeline — all in one platform.
@@ -46,17 +46,17 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
         >
           <Link
             to="/dashboard"
-            className="btn-primary flex items-center gap-2 text-lg animate-cta-glow"
+            className="btn-primary flex items-center gap-2 text-base sm:text-lg animate-cta-glow w-full sm:w-auto justify-center"
           >
             <Zap className="w-5 h-5" />
             Get Started Free
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <a href="#features" className="btn-outline-glow">
+          <a href="#features" className="btn-outline-glow w-full sm:w-auto text-center">
             See How It Works
           </a>
         </motion.div>
@@ -66,25 +66,25 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 60, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-20 glass-card p-2 max-w-4xl mx-auto"
+          className="mt-12 sm:mt-20 glass-card p-2 max-w-4xl mx-auto"
         >
-          <div className="rounded-xl bg-card/80 border border-border/30 p-6 aspect-video flex items-center justify-center">
-            <div className="w-full space-y-4">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-3 h-3 rounded-full bg-destructive/70" />
-                <div className="w-3 h-3 rounded-full bg-accent/70" />
-                <div className="w-3 h-3 rounded-full bg-primary-glow/70" />
-                <div className="flex-1 h-6 rounded-md bg-muted/50 max-w-xs mx-auto" />
+          <div className="rounded-xl bg-card/80 border border-border/30 p-4 sm:p-6 aspect-video flex items-center justify-center">
+            <div className="w-full space-y-3 sm:space-y-4">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-destructive/70" />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-accent/70" />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-primary-glow/70" />
+                <div className="flex-1 h-5 sm:h-6 rounded-md bg-muted/50 max-w-xs mx-auto" />
               </div>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="glass-card p-4 space-y-2">
-                    <div className="h-3 w-2/3 rounded bg-primary/20" />
-                    <div className="h-6 w-1/2 rounded bg-primary-glow/15 font-display text-lg gradient-text" />
+                  <div key={i} className="glass-card p-2 sm:p-4 space-y-1 sm:space-y-2">
+                    <div className="h-2 sm:h-3 w-2/3 rounded bg-primary/20" />
+                    <div className="h-4 sm:h-6 w-1/2 rounded bg-primary-glow/15" />
                   </div>
                 ))}
               </div>
-              <div className="h-32 rounded-xl bg-muted/30 border border-border/20" />
+              <div className="h-20 sm:h-32 rounded-xl bg-muted/30 border border-border/20" />
             </div>
           </div>
         </motion.div>

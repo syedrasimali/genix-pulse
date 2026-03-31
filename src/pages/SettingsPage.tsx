@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { User, Bell, Palette } from "lucide-react";
 
 const SettingsPage = () => (
-  <div className="p-8 max-w-2xl">
+  <div className="p-4 sm:p-6 lg:p-8 max-w-2xl">
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       <h1 className="text-3xl font-display font-bold mb-1">Settings</h1>
       <p className="text-muted-foreground mb-8">Manage your account and preferences.</p>

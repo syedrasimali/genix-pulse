@@ -72,8 +72,8 @@ const HeroSection = () => {
             <div className="w-full space-y-4">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-3 h-3 rounded-full bg-destructive/70" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
-                <div className="w-3 h-3 rounded-full bg-green-500/70" />
+                <div className="w-3 h-3 rounded-full bg-accent/70" />
+                <div className="w-3 h-3 rounded-full bg-primary-glow/70" />
                 <div className="flex-1 h-6 rounded-md bg-muted/50 max-w-xs mx-auto" />
               </div>
               <div className="grid grid-cols-4 gap-3">

@@ -4,6 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import DashboardHome from "./pages/DashboardHome";
 import LeadsPage from "./pages/LeadsPage";
@@ -20,6 +23,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardHome />} />
             <Route path="leads" element={<LeadsPage />} />

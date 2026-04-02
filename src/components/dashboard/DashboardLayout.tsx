@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Users, UserPlus, Sparkles, Settings, LogOut, Zap, Menu, X } from "lucide-react";
+import { toast } from "sonner";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true },

@@ -20,9 +20,12 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link to="/dashboard" className="hidden sm:flex btn-primary items-center gap-2 text-sm py-2 px-4">
+          <Link to="/login" className="hidden sm:flex text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2">
+            Sign In
+          </Link>
+          <Link to="/signup" className="hidden sm:flex btn-primary items-center gap-2 text-sm py-2 px-4">
             <Zap className="w-4 h-4" />
-            Get Started
+            Get Started Free
           </Link>
           <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

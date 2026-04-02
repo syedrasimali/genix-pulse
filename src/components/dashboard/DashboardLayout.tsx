@@ -67,7 +67,10 @@ const DashboardLayout = () => {
           ))}
         </nav>
         <div className="p-3 border-t border-sidebar-border">
-          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors w-full">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors w-full"
+          >
             <LogOut className="w-4 h-4" />
             Sign Out
           </button>

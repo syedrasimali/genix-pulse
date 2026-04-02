@@ -13,6 +13,13 @@ const navItems = [
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("leadgenix_user");
+    toast.success("Signed out successfully");
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">

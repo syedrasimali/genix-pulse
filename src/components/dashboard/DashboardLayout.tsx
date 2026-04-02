@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Users, UserPlus, Sparkles, Settings, LogOut, Zap, Menu, X } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -14,29 +15,20 @@ const navItems = [
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
-  const handleSignOut = () => {
-    localStorage.removeItem("leadgenix_user");
+  const handleSignOut = async () => {
+    await signOut();
     toast.success("Signed out successfully");
     navigate("/login");
   };
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Mobile overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-64 shrink-0 bg-sidebar border-r border-sidebar-border flex flex-col transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
-      >
+      <aside className={`fixed md:static inset-y-0 left-0 z-50 w-64 shrink-0 bg-sidebar border-r border-sidebar-border flex flex-col transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-primary-glow" />
@@ -48,42 +40,23 @@ const DashboardLayout = () => {
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-primary-foreground shadow-sm"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                }`
-              }
-            >
+            <NavLink key={item.to} to={item.to} end={item.end} onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive ? "bg-sidebar-accent text-sidebar-primary-foreground shadow-sm" : "text-sidebar-foreground hover:bg-sidebar-accent/50"}`}>
               <item.icon className="w-4 h-4" />
               {item.label}
             </NavLink>
           ))}
         </nav>
         <div className="p-3 border-t border-sidebar-border">
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors w-full"
-          >
+          <button onClick={handleSignOut} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors w-full">
             <LogOut className="w-4 h-4" />
             Sign Out
           </button>
         </div>
       </aside>
-
-      {/* Main content */}
       <main className="flex-1 overflow-y-auto bg-background">
-        {/* Mobile top bar */}
         <div className="sticky top-0 z-30 md:hidden flex items-center gap-3 px-4 h-14 border-b border-border/40 bg-background/80 backdrop-blur-md">
-          <button onClick={() => setSidebarOpen(true)}>
-            <Menu className="w-5 h-5 text-foreground" />
-          </button>
+          <button onClick={() => setSidebarOpen(true)}><Menu className="w-5 h-5 text-foreground" /></button>
           <span className="font-display font-bold gradient-text">LeadGenix</span>
         </div>
         <Outlet />

@@ -39,9 +39,10 @@ const Navbar = () => {
           <a href="#features" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setOpen(false)}>Features</a>
           <a href="#" className="block text-sm text-muted-foreground hover:text-foreground">Pricing</a>
           <a href="#" className="block text-sm text-muted-foreground hover:text-foreground">Docs</a>
-          <Link to="/dashboard" className="btn-primary flex items-center justify-center gap-2 text-sm py-2 w-full" onClick={() => setOpen(false)}>
+          <Link to="/login" className="block text-sm text-muted-foreground hover:text-foreground" onClick={() => setOpen(false)}>Sign In</Link>
+          <Link to="/signup" className="btn-primary flex items-center justify-center gap-2 text-sm py-2 w-full" onClick={() => setOpen(false)}>
             <Zap className="w-4 h-4" />
-            Get Started
+            Get Started Free
           </Link>
         </div>
       )}

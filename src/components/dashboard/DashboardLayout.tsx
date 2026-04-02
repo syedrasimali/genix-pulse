@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Users, UserPlus, Sparkles, Settings, LogOut, Zap, Menu, X } from "lucide-react";
+import { toast } from "sonner";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -12,6 +13,13 @@ const navItems = [
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("leadgenix_user");
+    toast.success("Signed out successfully");
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -59,7 +67,10 @@ const DashboardLayout = () => {
           ))}
         </nav>
         <div className="p-3 border-t border-sidebar-border">
-          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors w-full">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors w-full"
+          >
             <LogOut className="w-4 h-4" />
             Sign Out
           </button>

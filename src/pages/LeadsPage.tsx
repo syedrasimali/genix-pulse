@@ -36,7 +36,6 @@ const LeadsPage = () => {
     const { data, error } = await supabase
       .from("leads")
       .select("id, name, title, company, linkedin_url, status, location")
-      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     if (!error && data) setLeads(data as Lead[]);
     setLoading(false);

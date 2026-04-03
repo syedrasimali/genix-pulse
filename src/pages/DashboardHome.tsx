@@ -12,10 +12,10 @@ const DashboardHome = () => {
   useEffect(() => {
     if (!user) return;
     const fetchStats = async () => {
-      const { count } = await supabase.from("leads").select("*", { count: "exact", head: true }).eq("user_id", user.id);
+      const { count } = await supabase.from("leads").select("*", { count: "exact", head: true });
       setLeadCount(count ?? 0);
 
-      const { data } = await supabase.from("leads").select("status").eq("user_id", user.id);
+      const { data } = await supabase.from("leads").select("status");
       if (data) {
         setStatusCounts({
           contacted: data.filter((l) => l.status === "Contacted").length,

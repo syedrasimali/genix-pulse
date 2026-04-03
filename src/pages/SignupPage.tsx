@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Zap, Eye, EyeOff, ArrowRight, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import AnimatedBackground from "@/components/AnimatedBackground";
 
 const SignupPage = () => {

@@ -1,9 +1,13 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, Download, Filter, Trash2, ExternalLink, Upload } from "lucide-react";
+import { Search, Download, Filter, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import LeadStatusBadge from "@/components/leads/LeadStatusBadge";
+import LeadActions from "@/components/leads/LeadActions";
+import EditLeadDialog from "@/components/leads/EditLeadDialog";
+import { formatDistanceToNow } from "date-fns";
 
 type LeadStatus = "Pending" | "Contacted" | "Replied" | "Closed";
 
@@ -15,14 +19,10 @@ interface Lead {
   linkedin_url: string | null;
   status: LeadStatus;
   location: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
-
-const statusColors: Record<LeadStatus, string> = {
-  Pending: "bg-muted text-muted-foreground",
-  Contacted: "bg-primary/15 text-primary-glow",
-  Replied: "bg-emerald-500/15 text-emerald-400",
-  Closed: "bg-violet-500/15 text-violet-400",
-};
 
 function parseCSV(text: string): Record<string, string>[] {
   const lines = text.split(/\r?\n/).filter((l) => l.trim());
@@ -65,25 +65,33 @@ const LeadsPage = () => {
   const [filterStatus, setFilterStatus] = useState<LeadStatus | "All">("All");
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
+  const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
       .from("leads")
-      .select("id, name, title, company, linkedin_url, status, location")
+      .select("id, name, title, company, linkedin_url, status, location, notes, created_at, updated_at")
       .order("created_at", { ascending: false });
     if (!error && data) setLeads(data as Lead[]);
     setLoading(false);
-  };
+  }, [user]);
 
-  useEffect(() => { fetchLeads(); }, [user]);
+  useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("leads").delete().eq("id", id);
     if (error) { toast.error("Failed to delete"); return; }
     setLeads((prev) => prev.filter((l) => l.id !== id));
     toast.success("Lead deleted");
+  };
+
+  const handleStatusChange = async (id: string, status: LeadStatus) => {
+    const { error } = await supabase.from("leads").update({ status }).eq("id", id);
+    if (error) { toast.error("Failed to update status"); return; }
+    setLeads((prev) => prev.map((l) => l.id === id ? { ...l, status, updated_at: new Date().toISOString() } : l));
+    toast.success(`Status updated to ${status}`);
   };
 
   const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,17 +103,7 @@ const LeadsPage = () => {
       const rows = parseCSV(text);
       const mapped = rows.map(mapLinkedInRow).filter((r) => r.name.length > 0);
       if (mapped.length === 0) { toast.error("No valid leads found in CSV"); setImporting(false); return; }
-
-      const toInsert = mapped.map((r) => ({
-        user_id: user.id,
-        name: r.name,
-        title: r.title || null,
-        company: r.company || null,
-        linkedin_url: r.linkedin_url || null,
-        location: r.location || null,
-      }));
-
-      // Insert in batches of 100
+      const toInsert = mapped.map((r) => ({ user_id: user.id, name: r.name, title: r.title, company: r.company, linkedin_url: r.linkedin_url, location: r.location }));
       let inserted = 0;
       for (let i = 0; i < toInsert.length; i += 100) {
         const batch = toInsert.slice(i, i + 100);
@@ -113,12 +111,9 @@ const LeadsPage = () => {
         if (error) { toast.error(`Batch error: ${error.message}`); break; }
         inserted += batch.length;
       }
-
-      toast.success(`${inserted} leads imported successfully!`);
+      toast.success(`${inserted} leads imported!`);
       await fetchLeads();
-    } catch (err) {
-      toast.error("Failed to parse CSV file");
-    }
+    } catch { toast.error("Failed to parse CSV"); }
     setImporting(false);
     if (fileRef.current) fileRef.current.value = "";
   };
@@ -130,12 +125,11 @@ const LeadsPage = () => {
   });
 
   const exportCSV = () => {
-    const header = "Name,Title,Company,Status,Location\n";
-    const rows = filtered.map((l) => `"${l.name}","${l.title ?? ""}","${l.company ?? ""}","${l.status}","${l.location ?? ""}"`).join("\n");
+    const header = "Name,Title,Company,Status,Location,Created\n";
+    const rows = filtered.map((l) => `"${l.name}","${l.title ?? ""}","${l.company ?? ""}","${l.status}","${l.location ?? ""}","${l.created_at}"`).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "leads.csv"; a.click();
+    const a = document.createElement("a"); a.href = url; a.download = "leads.csv"; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -149,13 +143,8 @@ const LeadsPage = () => {
           </div>
           <div className="flex items-center gap-2">
             <input ref={fileRef} type="file" accept=".csv" onChange={handleCSVImport} className="hidden" />
-            <button
-              onClick={() => fileRef.current?.click()}
-              disabled={importing}
-              className="btn-outline-glow flex items-center gap-2 text-sm py-2 px-4 disabled:opacity-50"
-            >
-              <Upload className="w-4 h-4" />
-              {importing ? "Importing..." : "Import CSV"}
+            <button onClick={() => fileRef.current?.click()} disabled={importing} className="btn-outline-glow flex items-center gap-2 text-sm py-2 px-4 disabled:opacity-50">
+              <Upload className="w-4 h-4" />{importing ? "Importing..." : "Import CSV"}
             </button>
             <button onClick={exportCSV} className="btn-outline-glow flex items-center gap-2 text-sm py-2 px-4">
               <Download className="w-4 h-4" /> Export CSV
@@ -190,32 +179,37 @@ const LeadsPage = () => {
               <thead>
                 <tr className="border-b border-border/40">
                   <th className="text-left px-5 py-3 text-muted-foreground font-medium">Name</th>
-                  <th className="text-left px-5 py-3 text-muted-foreground font-medium">Title</th>
-                  <th className="text-left px-5 py-3 text-muted-foreground font-medium">Company</th>
+                  <th className="text-left px-5 py-3 text-muted-foreground font-medium hidden sm:table-cell">Title</th>
+                  <th className="text-left px-5 py-3 text-muted-foreground font-medium hidden md:table-cell">Company</th>
                   <th className="text-left px-5 py-3 text-muted-foreground font-medium">Status</th>
+                  <th className="text-left px-5 py-3 text-muted-foreground font-medium hidden lg:table-cell">Last Activity</th>
                   <th className="px-5 py-3" />
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((lead, i) => (
-                  <motion.tr key={lead.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b border-border/20 hover:bg-muted/20 transition-colors">
-                    <td className="px-5 py-4 font-medium">{lead.name}</td>
-                    <td className="px-5 py-4 text-muted-foreground">{lead.title ?? "-"}</td>
-                    <td className="px-5 py-4 text-muted-foreground">{lead.company ?? "-"}</td>
+                  <motion.tr key={lead.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }} className="border-b border-border/20 hover:bg-muted/20 transition-colors">
                     <td className="px-5 py-4">
-                      <span className={`inline-block px-2.5 py-1 rounded-md text-xs font-medium ${statusColors[lead.status]}`}>{lead.status}</span>
+                      <div>
+                        <span className="font-medium">{lead.name}</span>
+                        <span className="block text-xs text-muted-foreground sm:hidden">{lead.company ?? ""}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-muted-foreground hidden sm:table-cell">{lead.title ?? "-"}</td>
+                    <td className="px-5 py-4 text-muted-foreground hidden md:table-cell">{lead.company ?? "-"}</td>
+                    <td className="px-5 py-4"><LeadStatusBadge status={lead.status} /></td>
+                    <td className="px-5 py-4 text-xs text-muted-foreground hidden lg:table-cell">
+                      {formatDistanceToNow(new Date(lead.updated_at), { addSuffix: true })}
                     </td>
                     <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        {lead.linkedin_url && (
-                          <a href={lead.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary-glow transition-colors">
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        )}
-                        <button onClick={() => handleDelete(lead.id)} className="text-muted-foreground hover:text-red-400 transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <LeadActions
+                        leadId={lead.id}
+                        linkedinUrl={lead.linkedin_url}
+                        currentStatus={lead.status}
+                        onStatusChange={handleStatusChange}
+                        onEdit={(id) => setEditingLead(leads.find((l) => l.id === id) ?? null)}
+                        onDelete={handleDelete}
+                      />
                     </td>
                   </motion.tr>
                 ))}
@@ -224,6 +218,8 @@ const LeadsPage = () => {
           </div>
         )}
       </motion.div>
+
+      <EditLeadDialog lead={editingLead} open={!!editingLead} onClose={() => setEditingLead(null)} onSaved={fetchLeads} />
     </div>
   );
 };

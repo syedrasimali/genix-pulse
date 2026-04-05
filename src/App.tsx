@@ -16,6 +16,7 @@ import DashboardHome from "./pages/DashboardHome";
 import LeadsPage from "./pages/LeadsPage";
 import AddLeadPage from "./pages/AddLeadPage";
 import AIMessagesPage from "./pages/AIMessagesPage";
+import AILeadFinderPage from "./pages/AILeadFinderPage";
 import SettingsPage from "./pages/SettingsPage";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
                 <Route path="leads" element={<LeadsPage />} />
                 <Route path="add-lead" element={<AddLeadPage />} />
                 <Route path="ai-messages" element={<AIMessagesPage />} />
+                <Route path="ai-lead-finder" element={<AILeadFinderPage />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />

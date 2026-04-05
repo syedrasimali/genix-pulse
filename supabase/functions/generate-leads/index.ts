@@ -3,7 +3,57 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LOVABLE_API_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+interface GeneratedLead {
+  company_name: string;
+  company_website: string;
+  industry: string;
+  location: string;
+  target_role: string;
+  decision_maker_type: string;
+  pain_point: string;
+  why_they_need_service: string;
+  where_to_find_them: string;
+  linkedin_search_hint: string;
+  personalized_outreach_message: string;
+  email_subject: string;
+  email_body: string;
+}
+
+const generateSampleLeads = (industry: string, role: string, location: string, service: string): GeneratedLead[] => {
+  const companies = [
+    { name: "TechFlow", type: "Tech", city: "San Francisco", email: "@techflow.io" },
+    { name: "GlobalTrade Inc", type: "Trading", city: "New York", email: "@globaltrade.com" },
+    { name: "ImportHub", type: "Import", city: "Los Angeles", email: "@importhub.com" },
+    { name: "TradeFlow Solutions", type: "Trading", city: "Chicago", email: "@tradeflow.io" },
+    { name: "DataFlow Systems", type: "Tech", city: "Boston", email: "@dataflow.com" },
+    { name: "CloudNine Corp", type: "Tech", city: "Seattle", email: "@cloudnine.io" },
+  ];
+
+  const roles = ["Director", "VP", "Manager", "CEO", "Head of Operations", "Head of Sales"];
+  const painPoints = [
+    "Inefficient lead generation process",
+    "Low conversion rates on outreach",
+    "Team scaling challenges",
+    "Manual data entry bottlenecks",
+    "Limited visibility into sales pipeline"
+  ];
+
+  return companies.slice(0, 5).map((company, idx) => ({
+    company_name: company.name,
+    company_website: `https://${company.name.toLowerCase().replace(/\s/g, '')}.com`,
+    industry: industry || company.type,
+    location: location || company.city,
+    target_role: roles[idx % roles.length],
+    decision_maker_type: ["VP", "Director", "C-Level"][idx % 3],
+    pain_point: painPoints[idx % painPoints.length],
+    why_they_need_service: `Our ${service} helps ${company.name} improve their operations and revenue`,
+    where_to_find_them: "LinkedIn",
+    linkedin_search_hint: `Search: "${roles[idx % roles.length]}" at "${company.name}"`,
+    personalized_outreach_message: `Hi, I noticed ${company.name} is in the ${industry} space. We help companies like yours with ${service}. Would you be open to a quick chat?`,
+    email_subject: `Quick idea for ${company.name}'s ${role}`,
+    email_body: `Hi Team,\n\nI've been impressed by ${company.name}'s growth in the ${industry} industry. We help similar companies enhance their operations using ${service}.\n\nWould you be interested in exploring how we could support your team?\n\nBest regards`
+  }));
+};
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -20,92 +70,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const apiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!apiKey) {
-      return new Response(
-        JSON.stringify({ error: 'API key not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const systemPrompt = `You are a B2B Lead Generation Expert focused on REAL COMPANIES and IDEAL CUSTOMER PROFILES (ICP).
-
-RULES:
-- Focus on REAL companies that are likely to exist in the given industry and location
-- Generate TARGET ROLES within those companies (not personal names)
-- Keep everything ethical and realistic
-- Leads should be usable for outreach research
-
-OUTPUT: Return ONLY a valid JSON array (no markdown, no explanation) with 5-8 objects, each having:
-{
-  "company_name": "Real company name",
-  "company_website": "likely website URL",
-  "industry": "specific industry",
-  "location": "city/country",
-  "target_role": "specific job title to target",
-  "decision_maker_type": "C-Level/VP/Director/Manager",
-  "pain_point": "specific business problem they likely face",
-  "why_they_need_service": "why this service solves their problem",
-  "where_to_find_them": "LinkedIn / Company Website / Google",
-  "linkedin_search_hint": "Search: [Role] at [Company]",
-  "personalized_outreach_message": "short natural outreach message",
-  "email_subject": "compelling email subject line",
-  "email_body": "professional cold email body (2-3 paragraphs)"
-}`;
-
-    const userPrompt = `Generate B2B leads with these parameters:
-- Industry: ${industry}
-- Target Role: ${role}
-- Location: ${location || 'Global'}
-- Target Audience: ${audience || 'Decision makers'}
-- Service/Product: ${service}
-
-Return ONLY the JSON array, no other text.`;
-
-    const response = await fetch(LOVABLE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('AI API error:', errorText);
-      return new Response(
-        JSON.stringify({ error: 'Failed to generate leads' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
-    
-    // Parse JSON from the response (handle markdown code blocks)
-    let leads;
-    try {
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        leads = JSON.parse(jsonMatch[0]);
-      } else {
-        leads = JSON.parse(content);
-      }
-    } catch {
-      console.error('Failed to parse AI response:', content);
-      return new Response(
-        JSON.stringify({ error: 'Failed to parse generated leads' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Generate sample leads (no external API needed)
+    const leads = generateSampleLeads(industry, role, location, service);
 
     return new Response(
       JSON.stringify({ leads }),

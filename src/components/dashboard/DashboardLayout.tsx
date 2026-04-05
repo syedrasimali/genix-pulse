@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Users, UserPlus, Sparkles, Target, Settings, LogOut, Zap, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, UserPlus, Sparkles, Settings, LogOut, Zap, Menu, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import UserAvatar from "@/components/dashboard/UserAvatar";
@@ -11,7 +11,6 @@ const navItems = [
   { to: "/dashboard/leads", icon: Users, label: "Leads" },
   { to: "/dashboard/add-lead", icon: UserPlus, label: "Add Lead" },
   { to: "/dashboard/ai-messages", icon: Sparkles, label: "AI Messages" },
-  { to: "/dashboard/ai-lead-finder", icon: Target, label: "AI Lead Finder" },
   { to: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 

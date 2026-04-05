@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-type LeadStatus = "Pending" | "Contacted" | "Replied" | "Closed";
+type LeadStatus = "Pending" | "Contacted" | "Replied" | "Closed" | "Understood";
+type TradingType = "Export" | "Import" | "Trading" | "General";
 
 interface Lead {
   id: string;
@@ -12,6 +13,7 @@ interface Lead {
   company: string | null;
   linkedin_url: string | null;
   status: LeadStatus;
+  trading_type?: TradingType;
   location: string | null;
   notes: string | null;
 }
@@ -24,7 +26,7 @@ interface EditLeadDialogProps {
 }
 
 const EditLeadDialog = ({ lead, open, onClose, onSaved }: EditLeadDialogProps) => {
-  const [form, setForm] = useState({ name: "", title: "", company: "", linkedin_url: "", location: "", notes: "", status: "Pending" as LeadStatus });
+  const [form, setForm] = useState({ name: "", title: "", company: "", linkedin_url: "", location: "", notes: "", status: "Pending" as LeadStatus, trading_type: "General" as TradingType });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -37,6 +39,7 @@ const EditLeadDialog = ({ lead, open, onClose, onSaved }: EditLeadDialogProps) =
         location: lead.location ?? "",
         notes: lead.notes ?? "",
         status: lead.status,
+        trading_type: lead.trading_type ?? "General",
       });
     }
   }, [lead]);
@@ -52,6 +55,7 @@ const EditLeadDialog = ({ lead, open, onClose, onSaved }: EditLeadDialogProps) =
       location: form.location || null,
       notes: form.notes || null,
       status: form.status,
+      trading_type: form.trading_type,
     }).eq("id", lead.id);
     setSaving(false);
     if (error) { toast.error("Failed to update"); return; }
@@ -90,7 +94,7 @@ const EditLeadDialog = ({ lead, open, onClose, onSaved }: EditLeadDialogProps) =
               onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value as LeadStatus }))}
               className="glass-input w-full"
             >
-              {(["Pending", "Contacted", "Replied", "Closed"] as const).map((s) => (
+              {(["Pending", "Contacted", "Replied", "Closed", "Understood"] as const).map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>

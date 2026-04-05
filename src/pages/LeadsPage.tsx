@@ -9,7 +9,8 @@ import LeadActions from "@/components/leads/LeadActions";
 import EditLeadDialog from "@/components/leads/EditLeadDialog";
 import { formatDistanceToNow } from "date-fns";
 
-type LeadStatus = "Pending" | "Contacted" | "Replied" | "Closed";
+type LeadStatus = "Pending" | "Contacted" | "Replied" | "Closed" | "Understood";
+type TradingType = "Export" | "Import" | "Trading" | "General";
 
 interface Lead {
   id: string;
@@ -18,6 +19,7 @@ interface Lead {
   company: string | null;
   linkedin_url: string | null;
   status: LeadStatus;
+  trading_type: TradingType;
   location: string | null;
   notes: string | null;
   created_at: string;
@@ -72,7 +74,7 @@ const LeadsPage = () => {
     if (!user) return;
     const { data, error } = await supabase
       .from("leads")
-      .select("id, name, title, company, linkedin_url, status, location, notes, created_at, updated_at")
+      .select("id, name, title, company, linkedin_url, status, trading_type, location, notes, created_at, updated_at")
       .order("created_at", { ascending: false });
     if (!error && data) setLeads(data as Lead[]);
     setLoading(false);
@@ -160,7 +162,7 @@ const LeadsPage = () => {
         </div>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-muted-foreground" />
-          {(["All", "Pending", "Contacted", "Replied", "Closed"] as const).map((s) => (
+          {(["All", "Pending", "Contacted", "Replied", "Closed", "Understood"] as const).map((s) => (
             <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filterStatus === s ? "bg-primary/20 text-primary-glow" : "text-muted-foreground hover:bg-muted/50"}`}>
               {s}
             </button>
@@ -182,6 +184,7 @@ const LeadsPage = () => {
                   <th className="text-left px-5 py-3 text-muted-foreground font-medium hidden sm:table-cell">Title</th>
                   <th className="text-left px-5 py-3 text-muted-foreground font-medium hidden md:table-cell">Company</th>
                   <th className="text-left px-5 py-3 text-muted-foreground font-medium">Status</th>
+                  <th className="text-left px-5 py-3 text-muted-foreground font-medium hidden xl:table-cell">Type</th>
                   <th className="text-left px-5 py-3 text-muted-foreground font-medium hidden lg:table-cell">Last Activity</th>
                   <th className="px-5 py-3" />
                 </tr>
@@ -198,6 +201,7 @@ const LeadsPage = () => {
                     <td className="px-5 py-4 text-muted-foreground hidden sm:table-cell">{lead.title ?? "-"}</td>
                     <td className="px-5 py-4 text-muted-foreground hidden md:table-cell">{lead.company ?? "-"}</td>
                     <td className="px-5 py-4"><LeadStatusBadge status={lead.status} /></td>
+                    <td className="px-5 py-4 text-xs text-muted-foreground hidden xl:table-cell">{lead.trading_type}</td>
                     <td className="px-5 py-4 text-xs text-muted-foreground hidden lg:table-cell">
                       {formatDistanceToNow(new Date(lead.updated_at), { addSuffix: true })}
                     </td>

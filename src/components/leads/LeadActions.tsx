@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 
-type LeadStatus = "Pending" | "Contacted" | "Replied" | "Closed";
+type LeadStatus = "Pending" | "Contacted" | "Replied" | "Closed" | "Understood";
 
 interface LeadActionsProps {
   leadId: string;
@@ -52,6 +52,11 @@ const LeadActions = ({ leadId, linkedinUrl, currentStatus, onStatusChange, onEdi
         {currentStatus !== "Closed" && (
           <DropdownMenuItem onClick={() => onStatusChange(leadId, "Closed")}>
             <XCircle className="w-4 h-4 mr-2" /> Mark Closed
+          </DropdownMenuItem>
+        )}
+        {currentStatus !== "Understood" && (
+          <DropdownMenuItem onClick={() => onStatusChange(leadId, "Understood")}>
+            <MessageCircle className="w-4 h-4 mr-2" /> Mark Understood
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
